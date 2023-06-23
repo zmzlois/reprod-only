@@ -2,15 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
- #head {
-			transition: background-color 1s ease;
-			position: --webkit-sticky;
-			position: sticky;
-			top: 0px;
-		}
-    @property --color-a {
+  #head {
+    transition: background-color 1s ease;
+    position: --webkit-sticky;
+    position: sticky;
+    top: 0px;
+  }
+  @property --color-a {
     syntax: "<color>";
     inherits: true;
     initial-value: transparent;
@@ -25,10 +24,10 @@
     inherits: true;
     initial-value: transparent;
   }
-  }
+}
 
-  @layer utilities{
-    /* For "include memes" color transition on home page \\ */
+@layer utilities {
+  /* For "include memes" color transition on home page \\ */
   .color {
     animation: color-change 1s infinite;
   }
@@ -52,10 +51,8 @@
       color: orange;
     }
   }
-  
-.indigo-box-shadow {
-box-shadow: 6px 6px indigo;
 
-}
-
+  .indigo-box-shadow {
+    box-shadow: 6px 6px indigo;
   }
+}
