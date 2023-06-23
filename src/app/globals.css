@@ -2,26 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@layer base {
+ #head {
+			transition: background-color 1s ease;
+			position: --webkit-sticky;
+			position: sticky;
+			top: 0px;
+		}
+    @property --color-a {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
   }
+  @property --color-b {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+  }
+  @property --color-c {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+  }
+  }
+
+  @layer utilities{
+    /* For "include memes" color transition on home page \\ */
+  .color {
+    animation: color-change 1s infinite;
+  }
+  @keyframes color-change {
+    0% {
+      color: red;
+    }
+    20% {
+      color: blue;
+    }
+    40% {
+      color: green;
+    }
+    60% {
+      color: yellow;
+    }
+    80% {
+      color: purple;
+    }
+    100% {
+      color: orange;
+    }
+  }
+  
+.indigo-box-shadow {
+box-shadow: 6px 6px indigo;
+
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
+  }
