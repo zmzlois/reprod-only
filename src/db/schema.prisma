@@ -1,0 +1,273 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+
+// TODO: make sure if Account + User model are needed in the case of using Clerk.
+model Account {
+  id                String          @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String          @unique
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  discordAccount    DiscordAccount? @relation(fields: [providerAccountId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// Main user table
+model User {
+  id               String             @id                 // discord id
+  userId           String             @default(cuid()) @unique      // user id from clerk
+  username         String             @db.VarChar(255)    // discord username
+  email            String?            @db.VarChar(255) @unique   // discord email
+  avatar           String?            @db.VarChar(255) // discord avatar
+  xp               Int                @default(0)     // participate or hosted questions will get xp
+                                                        // 10 points for hosting, 5 points for participating                   
+  deleted         Boolean            @default(false)    // soft delete implementation, if user is deleted, set to true, retain data for 3-6 month, give user a new userId if they come back
+  // reason being some teams want to check team performance, or in a nutrionist scenario, both doctors and users want to check their past data
+  createdAt        DateTime           @default(now())   // when user is created
+  updatedAt        DateTime           @updatedAt
+  lastLogin        DateTime?          // last login time come from Clerk.dev
+
+  //project         QuestionSettings[]        @relation("ProjectParticipant")  // user can create multiple projects
+  plan             PaymentType            // Whether paid or not, check below enum PaymentType, both admin and participants can pay for the service, can also send a payment link to others to pay for them
+  questionSettings QuestionSettings[]       // user can create multiple question tasks.
+  creator          AdminParticipant[]       @relation("Creator")
+  admin            AdminParticipant[]            @relation("Admin")
+  participants     AdminParticipant[]         @relation("QuestionParticipant")
+  receivedKudos    Kudo[]             @relation("receivedKudos")
+  givenKudos       Kudo[]             @relation("givenKudos")
+
+
+  Account         Account[] 
+  response       Response?
+
+  @@unique([id,email])
+}
+
+model DiscordAccount {
+  id                 String               @id @unique
+  name               String
+  avatar             String?
+  Account            Account?
+  userServerSettings UserServerSettings[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+
+model UserServerSettings {
+  id      String        @id @default(cuid()) @unique
+  userId   String
+  // Answer Overflow Settings
+ // bitfield Int    @default(0) @db.UnsignedInt
+
+  user   DiscordAccount @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  server Server[]         
+
+  @@index([userId])
+
+}
+
+
+model Kudo {
+  id                String             @id @default(cuid())
+  category          KudoCategory
+  description       String?           @db.VarChar(255)
+  points           Int?               @default(1)
+  responseId        Int
+  response         Response           @relation(fields: [responseId], references: [id])
+  receiver          User               @relation("receivedKudos", fields: [receiverId], references: [id])
+  receiverId        String            @db.VarChar(255)
+  giver             User               @relation("givenKudos", fields: [giverId], references: [id])
+  giverId           String            @db.VarChar(255)
+  multiplier        Int?               @default(1)
+  createdAt         DateTime           @default(now())
+
+  @@index(receiverId)
+  @@index(responseId)
+  @@index(giverId)
+}
+
+
+model Server {
+  // Discord Data
+  id          String  @id @unique
+  name        String  @db.VarChar(100)
+  icon        String? @db.VarChar(250)
+  description String?
+  questionSettingId  Int
+
+  // Answer Overflow Settings
+  // bitfield   Int       @default(0) @db.UnsignedInt
+  // kickedTime DateTime?
+  vanityUrl  String?   @unique
+
+  // Relations
+  userServerSettings UserServerSettings[]
+  questionSettings   QuestionSettings   @relation(fields:[questionSettingId], references: [id])
+  channels           Channel[]
+  response           Response?
+
+  @@index([questionSettingId])
+ 
+}
+
+model Channel {
+  id          Int                 @id @default(autoincrement())
+  channelId    String             @unique
+  channelLink  String             @unique
+  questionSettingId  Int          @unique
+  serverId     String
+  server      Server              @relation(fields: [serverId], references: [id])
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  // Relations
+  questionSettings   QuestionSettings   @relation(fields:[questionSettingId], references: [id])
+  response           Response?
+
+  @@index ([channelId])
+  @@index ([serverId])
+
+  }
+
+  model Questions {
+    id           Int                @id @default(autoincrement()) @unique
+    question     String             @db.VarChar(255) 
+    type         QuestionType   
+    createdAt    DateTime           @default(now())
+    updatedAt    DateTime           @updatedAt
+
+    questionSettings QuestionSettings @relation(fields: [id], references: [id])
+  
+  }
+
+model AdminParticipant {
+  id              String              @id @default(cuid()) @unique
+  creatorId       String              @unique
+  creator         User                @relation("Creator", fields: [creatorId], references: [id])
+  adminId         String              
+  admin           User                @relation("Admin", fields: [adminId], references: [id])
+  participant     User                @relation("QuestionParticipant", fields: [participantId], references: [id])
+  participantId   String      
+
+  @@index(adminId)
+  @@index(participantId)        
+}
+  model Response {
+    id           Int                @id @default(autoincrement())
+    questionSettingId  Int
+    userId       String             @unique
+    serverId      String          @unique
+    channelId     String          @unique     
+    responseId     String
+    createdAt    DateTime           @default(now())
+    updatedAt    DateTime           @updatedAt
+
+    user         User              @relation(fields: [userId], references: [id])
+    server        Server             @relation(fields: [serverId], references: [id])
+    channel       Channel            @relation(fields: [channelId], references: [channelId])
+    kudo        Kudo[]
+    questionSettings QuestionSettings @relation(fields: [questionSettingId], references: [id])
+    
+    @@index ([userId])
+    @@index ([serverId])
+    @@index ([questionSettingId])
+  }
+
+
+// This is the table for clerk organisation
+// model Project {
+//      id        String   @id @default(cuid())
+//     createdAt DateTime @default(now())
+
+//     // A project is tied to a Clerk User or Organization
+//     organizationId String? @db.VarChar(36) // uuid v4
+//     user          QuestionSettings[]        @relation("ProjectUser") // a many to many relationship with users
+//     task          QuestionSettings[]         @relation("ProjectTask")  // Organisation allows multiple tasks
+
+//     name String
+//     tier ProjectTier @default(FREE)
+//     url  String?
+
+//     @@index([organizationId])
+
+// }
+
+
+  model QuestionSettings {
+   id             Int               @id @default(autoincrement()) @unique
+  cronSchedule   String             @db.VarChar(255)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+        
+ // projectId      String             @unique
+ //project        Project            @relation("ProjectTask", fields: [projectId], references: [id])
+ // projectUser    Project            @relation("ProjectUser", fields: [projectId], references: [id])
+ // projectUserId  String            @unique
+  participants   User               @relation(fields: [participantId], references: [id])
+  participantId  String
+  server         Server[]             
+  channel        Channel[]            
+  question       Questions[]
+  response       Response[]
+  
+
+  @@index ([id])
+  @@index ([participantId])
+ 
+   
+  }
+
+enum KudoCategory {
+  TEAMWORK
+  LEADERSHIP
+  INNOVATION
+  COMMUNITY
+  OWNERSHIP
+  BUILD
+  QUALITY
+  RESPECT
+  INTEGRITY
+  COMMUNICATION
+  GROWTH
+  FUN
+}
+
+enum PaymentType {
+  FREE
+  BASIC
+  PRO
+}
+
+enum QuestionType {
+  TEXT
+  IMAGE
+  GIF
+}
+
+enum ProjectTier {
+    FREE
+    PRO
+}
