@@ -1,40 +1,47 @@
-import React from 'react'
-import { MultiToggle } from './toggle'
-import z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useFieldArray, useForm } from "react-hook-form"
-const dateSchema = z.object({
-  weekdays: z.array(z.string()),
-})
+"use client"
+import * as React from "react"
+import { useForm, useController, UseControllerProps } from "react-hook-form"
 
-function Page() {
 
-const form = useForm({
-  resolver: zodResolver(dateSchema),
-  defaultValues: {
-    weekdays: [],
-  },
-})
+type FormValues = {
+  FirstName: string
+}
+
+
+function Input(props: UseControllerProps<FormValues>) {
+  const { field, fieldState } = useController(props)
+
+
   return (
     <div>
-
-            <MultiToggle
-              options={WeekDays.map((day) => day)}
-              control={form.control}
-              name="weekdays"
-            />
+      <input {...field} placeholder={props.name} />
+      <p>{fieldState.isTouched && "Touched"}</p>
+      <p>{fieldState.isDirty && "Dirty"}</p>
+      <p>{fieldState.invalid ? "invalid" : "valid"}</p>
     </div>
   )
 }
 
-export default Page
 
-const WeekDays = [
-  { name: "Mon", id: "1" },
-  { name: "Tue", id: "2" },
-  { name: "Wed", id: "3" },
-  { name: "Thu", id: "4" },
-  { name: "Fri", id: "5" },
-  { name: "Sat", id: "6" },
-  { name: "Sun", id: "7" },
-]
+export default function App() {
+  const { handleSubmit, control } = useForm<FormValues>({
+    defaultValues: {
+      FirstName: "",
+    },
+    mode: "onChange",
+  })
+ 
+  const [yesdata, setData] = React.useState<FormValues>({ FirstName: "" })
+  const onSubmit = (data: FormValues) => {
+    setData(data)
+    console.log(data)
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Input control={control} name="FirstName" rules={{ required: true }} />
+      <p>{JSON.stringify(yesdata).split(":")[1].replace(/["}]/g, "")}</p>
+      <input type="submit" />
+    </form>
+  )
+}
