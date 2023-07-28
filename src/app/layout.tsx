@@ -1,7 +1,8 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-import { ClerkProvider} from "@clerk/nextjs"
+import { ClerkProvider, UserButton, SignedIn, SignedOut } from "@clerk/nextjs"
 import { Toaster } from '@/components/ui/toaster'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,11 +18,21 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-    <html lang="en">
+      <html lang="en">
         <body className={inter.className}>{children}
-        <Toaster />
+          <Toaster />
+          <div className="w-full h-9 bg-gray-200 fixed top-0">
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+            <SignedOut>
+              <Link href="/sign-in">
+                <button>Sign In</button>
+              </Link>
+            </SignedOut>
+          </div>
         </body>
       </html>
-      </ClerkProvider>
+    </ClerkProvider>
   )
 }
