@@ -139,13 +139,8 @@ model Server {
   icon            String? @db.VarChar(250)
   description     String?
 
-  // Answer Overflow Settings
-  // bitfield   Int       @default(0) @db.UnsignedInt
   kickedTime DateTime? @db.Timestamp()
   vanityUrl  String?   @unique
-
-  // Relations
-  // user            UserServerSettings[]
 
   channels         Channel[] // Keep this because we need to run a query to get all channels in a server, also need to remember which channel we are sending message to
   DiscordAccount   DiscordAccount? @relation(fields: [discordAccountId], references: [id])
