@@ -31,7 +31,7 @@ export default function Form (){
         <p>
             In which city is there a billboard that turns air into drinkable water?
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onBlur={() => setError(null)}>
         <textarea
             value={answer}
             className={"text-black"}

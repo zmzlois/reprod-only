@@ -1,12 +1,13 @@
 import Image from 'next/image'
 import Form from "@/app/form";
+import Picture from "@/app/remove-css";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center  p-24">
 
-      <Form />
 
+      <Picture />
 
     </main>
   )
