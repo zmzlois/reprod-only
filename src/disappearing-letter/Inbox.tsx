@@ -7,9 +7,11 @@ import {set} from "zod";
 
 export default function MailClient() {
     const [letters, setLetters] = useState(initialLetters);
-    const [highlightedLetter, setHighlightedLetter] = useState(initialLetters);
+    const [highlightedLetterId, setHighlightedLetterId] = useState(null);
 
-
+ function handleHover(letterId){
+        setHighlightedLetterId(letterId);
+ }
 
     function handleStar(starred) {
         setLetters(letters.map(letter => {
@@ -33,9 +35,9 @@ export default function MailClient() {
                         key={letter.id}
                         letter={letter}
                         isHighlighted={
-                            highlightedLetter && highlightedLetter.id === letter.id
+                            letter.id === highlightedLetterId
                         }
-                        onHover={setHighlightedLetter}
+                        onHover={handleHover}
 
                         onToggleStar={handleStar}
                     />

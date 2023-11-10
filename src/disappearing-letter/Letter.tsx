@@ -11,14 +11,14 @@ export default function Letter({
                 isHighlighted ? 'bg-blue-400' : ''
             }
             onFocus={() => {
-                onHover(letter);
+                onHover(letter.id);
             }}
             onPointerMove={() => {
-                onHover(letter);
+                onHover(letter.id);
             }}
         >
             <button onClick={() => {
-                onToggleStar(letter);
+                onToggleStar(letter.id);
             }}>
                 {letter.isStarred ? 'Unstar' : 'Star'}
             </button>
