@@ -1,7 +1,7 @@
 "use client"
 import { useState } from 'react';
-import AddItem from './AddItem.js';
-import PackingList from './PackingList.js';
+import AddItem from './AddItem';
+import PackingList from './PackingList';
 
 let nextId = 3;
 const initialItems = [

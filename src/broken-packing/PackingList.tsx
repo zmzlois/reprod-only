@@ -6,7 +6,7 @@ export default function PackingList({
                                         onDeleteItem
                                     }) {
     return (
-        <ul>
+        <ul className={"flex flex-col gap-4"}>
             {items.map(item => (
                 <li key={item.id}>
                     <label>
@@ -23,7 +23,7 @@ export default function PackingList({
                         {' '}
                         {item.title}
                     </label>
-                    <button onClick={() => onDeleteItem(item.id)}>
+                    <button className={"bg-zinc-400 py-1 rounded-md px-4 mx-2"} onClick={() => onDeleteItem(item.id)}>
                         Delete
                     </button>
                 </li>
