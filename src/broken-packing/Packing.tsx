@@ -12,11 +12,10 @@ const initialItems = [
 
 export default function TravelPlan() {
     const [items, setItems] = useState(initialItems);
-    const [total, setTotal] = useState(3);
     const [packed, setPacked] = useState(1);
 
     function handleAddItem(title) {
-        setTotal(total + 1);
+
         setItems([
             ...items,
             {
@@ -43,7 +42,7 @@ export default function TravelPlan() {
     }
 
     function handleDeleteItem(itemId) {
-        setTotal(total - 1);
+
         setItems(
             items.filter(item => item.id !== itemId)
         );
@@ -60,7 +59,7 @@ export default function TravelPlan() {
                 onDeleteItem={handleDeleteItem}
             />
             <hr />
-            <b>{packed} out of {total} packed!</b>
+            <b>{packed} out of {items.length} packed!</b>
         </>
     );
 }
