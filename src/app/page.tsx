@@ -1,4 +1,4 @@
-import MailClient from "@/multiple-selection/inbox";
+import SyncedInputs from "@/sharing-state/synced-input";
 
 
 export default function Home() {
@@ -6,7 +6,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center  p-24">
 
 
-<MailClient/>
+<SyncedInputs/>
 
     </main>
   )
