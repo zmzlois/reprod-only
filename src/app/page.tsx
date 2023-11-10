@@ -1,4 +1,4 @@
-import MailClient from "@/disappearing-letter/Inbox";
+import MailClient from "@/multiple-selection/inbox";
 
 
 export default function Home() {
