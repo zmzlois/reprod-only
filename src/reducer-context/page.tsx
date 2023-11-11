@@ -3,6 +3,7 @@
 import { useReducer } from 'react';
 import AddTask from './AddTask';
 import TaskList from './TaskList';
+import { TasksContext, TaskDispatchContext } from "@/reducer-context/TasksContext";
 
 export default function TaskApp() {
     const [tasks, dispatch] = useReducer(
@@ -33,17 +34,20 @@ export default function TaskApp() {
     }
 
     return (
-        <>
-            <h1>Day off in Kyoto</h1>
-            <AddTask
-                onAddTask={handleAddTask}
-            />
-            <TaskList
-                tasks={tasks}
-                onChangeTask={handleChangeTask}
-                onDeleteTask={handleDeleteTask}
-            />
-        </>
+        <TasksContext.Provider value={tasks}>
+            <TaskDispatchContext.Provider value={dispatch}>
+                <div className={"flex flex-col gap-4"}>
+                    <h1>Day off in Kyoto</h1>
+                    <AddTask
+
+                    />
+                    <TaskList
+
+                    />
+                </div>
+            </TaskDispatchContext.Provider>
+        </TasksContext.Provider>
+
     );
 }
 
